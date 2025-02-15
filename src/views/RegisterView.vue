@@ -1,54 +1,51 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { zodResolver } from '@primevue/forms/resolvers/zod'
-import { useToast } from 'primevue/usetoast'
-import { z } from 'zod'
-import { Form, type FormSubmitEvent } from '@primevue/forms'
-import InputText from 'primevue/inputtext'
-import Message from 'primevue/message'
-import Button from 'primevue/button'
-import { useRouter } from 'vue-router'
+import { ref } from 'vue';
+import { zodResolver } from '@primevue/forms/resolvers/zod';
+import { useToast } from 'primevue/usetoast';
+import { z } from 'zod';
+import { Form, type FormSubmitEvent } from '@primevue/forms';
+import InputText from 'primevue/inputtext';
+import Message from 'primevue/message';
+import Button from 'primevue/button';
+import { useRouter } from 'vue-router';
 
-const toast = useToast()
-const router = useRouter()
+const toast = useToast();
+const router = useRouter();
 const initialValues = ref({
   username: '',
   email: '',
   password: '',
-})
+});
 
 const resolver = ref(
   zodResolver(
     z.object({
       username: z.string().min(1, { message: 'Username is required.' }),
-      email: z
-        .string()
-        .min(1, { message: 'Email is required.' })
-        .email({ message: 'Invalid email address.' }),
+      email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address.' }),
       password: z
         .string()
         .min(1, { message: 'Password is required.' })
         .max(20, { message: 'Password is too long.' })
         .refine(
           (value) => {
-            return !/\s/.test(value)
+            return !/\s/.test(value);
           },
-          { message: 'Password should not contain spaces.' },
+          { message: 'Password should not contain spaces.' }
         ),
-    }),
-  ),
-)
+    })
+  )
+);
 
 const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
-  console.log('Form is submitted with value: ', values)
+  console.log('Form is submitted with value: ', values);
   if (valid) {
     toast.add({
       severity: 'success',
       summary: 'Form is submitted',
       life: 3000,
-    })
+    });
   }
-}
+};
 </script>
 
 <template>
