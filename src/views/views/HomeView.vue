@@ -34,7 +34,7 @@ const router = useRouter();
       <template #start>
         <Avatar shape="circle" :onclick="() => router.push('/dashboard')">
           <template #icon>
-            <img src="../assets/cs_masters_logo.png" />
+            <img src="../../assets/cs_masters_logo.png" />
           </template>
         </Avatar>
       </template>
@@ -51,7 +51,7 @@ const router = useRouter();
           <Button label="Logout" @click="router.replace('/login')" />
           <Avatar shape="circle">
             <template #icon>
-              <img src="../assets/cs_masters_logo.png" />
+              <img src="../../assets/cs_masters_logo.png" />
             </template>
           </Avatar>
         </div>
