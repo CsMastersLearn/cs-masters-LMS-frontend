@@ -5,11 +5,12 @@ import { useErrorStore } from './errorStore';
 import type { Subscription } from '@supabase/supabase-js';
 
 export const useAuthStore = defineStore('auth', () => {
-  const session = ref();
+  const userSession = ref();
 
   const errorStore = useErrorStore();
 
   let subscribedSession: { subscription: Subscription } | null = null;
+
   async function registerAuthListner() {
     const { data } = auth.onAuthStateChange((event, session) => {
       console.log(event, session);
@@ -18,10 +19,10 @@ export const useAuthStore = defineStore('auth', () => {
         // handle initial session
       } else if (event === 'SIGNED_IN') {
         // handle sign in event
-        session = session;
+        userSession.value = session;
       } else if (event === 'SIGNED_OUT') {
         // handle sign out event
-        session = null;
+        userSession.value = null;
       } else if (event === 'PASSWORD_RECOVERY') {
         // handle password recovery event
       } else if (event === 'TOKEN_REFRESHED') {
@@ -40,8 +41,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function getSession() {
-    return session.value;
+  function getSession() {
+    return userSession.value;
   }
 
   async function signUpUser(email: string, password: string) {
@@ -52,5 +53,18 @@ export const useAuthStore = defineStore('auth', () => {
 
     if (error) errorStore.setError(error.message);
   }
-  return { removeAuthListner, registerAuthListner, getSession, signUpUser };
+
+  async function signInUser(email: string, password: string) {
+    const { error } = await auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      errorStore.setError(error.message);
+      return error;
+    }
+  }
+
+  return { removeAuthListner, registerAuthListner, getSession, signUpUser, signInUser };
 });

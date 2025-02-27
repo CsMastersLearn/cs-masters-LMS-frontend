@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { z } from 'zod';
+
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { useToast } from 'primevue/usetoast';
-import { z } from 'zod';
 import { Form, type FormSubmitEvent } from '@primevue/forms';
 import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
 import { useRouter } from 'vue-router';
 import Toast from 'primevue/toast';
+import { useAuthStore } from '@/stores/authStore';
+import { useErrorStore } from '@/stores/errorStore';
 
 const toast = useToast();
 const router = useRouter();
+const authStore = useAuthStore();
+const errorStore = useErrorStore();
+
 const initialValues = ref({
   email: '',
   password: '',
@@ -26,15 +32,26 @@ const resolver = ref(
   )
 );
 
-const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
-  console.log('Form is submitted with value: ', values);
+const onFormSubmit = async ({ valid, values }: FormSubmitEvent) => {
   if (valid) {
-    toast.add({
-      severity: 'success',
-      summary: 'Form is submitted',
-      detail: 'Message Content',
-      life: 3000,
-    });
+    const error = await authStore.signInUser(values.email, values.password);
+
+    if (error && errorStore.getError()) {
+      toast.add({
+        severity: 'error',
+        summary: 'Login Failed',
+        detail: errorStore.getError(),
+        life: 3000,
+      });
+    } else {
+      router.replace('/');
+      toast.add({
+        severity: 'success',
+        summary: 'Login Successfull',
+        detail: 'User Logged in successfully',
+        life: 3000,
+      });
+    }
   }
 };
 </script>

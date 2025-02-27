@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { z } from 'zod';
+import { useRouter } from 'vue-router';
+
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { useToast } from 'primevue/usetoast';
-import { z } from 'zod';
 import { Form, type FormSubmitEvent } from '@primevue/forms';
 import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
-import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore';
 
 const toast = useToast();
 const router = useRouter();
+const authStore = useAuthStore();
+
 const initialValues = ref({
   username: '',
   email: '',
@@ -36,8 +40,9 @@ const resolver = ref(
   )
 );
 
-const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
+const onFormSubmit = async ({ valid, values }: FormSubmitEvent) => {
   console.log('Form is submitted with value: ', values);
+  await authStore.signUpUser(values.email, values.password);
   if (valid) {
     toast.add({
       severity: 'success',
