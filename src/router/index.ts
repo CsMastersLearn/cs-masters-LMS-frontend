@@ -6,6 +6,7 @@ import DemoView from '@/views/pages/CoursesPage.vue';
 import BlogsPage from '@/views/pages/BlogsPage.vue';
 import StudyMaterialPage from '@/views/pages/StudyMaterialPage.vue';
 import DashboardPage from '@/views/pages/DashboardPage.vue';
+import { useAuthStore } from '@/stores/authStore';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,5 +51,26 @@ const router = createRouter({
     },
   ],
 });
+
+export const setupRouteGaurds = async () => {
+  const authStore = useAuthStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  router.beforeEach(async (to, from) => {
+    const { data, error } = await authStore.getSession();
+
+    if (error) {
+      // TODO: Toast Display of error
+      return { name: 'login' };
+    }
+
+    if (!data?.session && to.name !== 'login' && to.name !== 'register') {
+      return { name: 'login' };
+    }
+
+    if (data?.session && (to.name === 'login' || to.name === 'register')) {
+      return { name: 'home' };
+    }
+  });
+};
 
 export default router;
