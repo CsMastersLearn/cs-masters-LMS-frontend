@@ -41,17 +41,35 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function getSession() {
-    return userSession.value;
+  async function getSession() {
+    const { data, error } = await auth.getSession();
+
+    if (error) {
+      errorStore.setError(error.message);
+      return { error };
+    } else {
+      errorStore.resetError();
+      return { data };
+    }
   }
 
-  async function signUpUser(email: string, password: string) {
+  async function signUpUser(name: string, email: string, password: string) {
     const { error } = await auth.signUp({
       email: email,
       password: password,
+      options: {
+        data: {
+          username: name,
+        },
+      },
     });
 
-    if (error) errorStore.setError(error.message);
+    if (error) {
+      errorStore.setError(error.message);
+      return error;
+    } else {
+      errorStore.resetError();
+    }
   }
 
   async function signInUser(email: string, password: string) {
@@ -63,8 +81,21 @@ export const useAuthStore = defineStore('auth', () => {
     if (error) {
       errorStore.setError(error.message);
       return error;
+    } else {
+      errorStore.resetError();
     }
   }
 
-  return { removeAuthListner, registerAuthListner, getSession, signUpUser, signInUser };
+  async function logoutUser() {
+    const { error } = await auth.signOut();
+
+    if (error) {
+      errorStore.setError(error.message);
+      return error;
+    } else {
+      errorStore.resetError();
+    }
+  }
+
+  return { removeAuthListner, registerAuthListner, getSession, signUpUser, signInUser, logoutUser };
 });

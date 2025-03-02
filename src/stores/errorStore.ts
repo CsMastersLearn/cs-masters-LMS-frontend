@@ -12,5 +12,9 @@ export const useErrorStore = defineStore('error', () => {
     return error.value;
   }
 
-  return { setError, getError };
+  function resetError() {
+    error.value = null;
+  }
+
+  return { setError, getError, resetError };
 });

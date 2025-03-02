@@ -54,14 +54,20 @@ const router = createRouter({
 
 export const setupRouteGaurds = async () => {
   const authStore = useAuthStore();
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   router.beforeEach(async (to, from) => {
-    if (!authStore.getSession() && to.name !== 'login' && to.name !== 'register') {
+    const { data, error } = await authStore.getSession();
+
+    if (error) {
+      // TODO: Toast Display of error
       return { name: 'login' };
     }
 
-    if (authStore.getSession() && (to.name === 'login' || to.name === 'register')) {
+    if (!data?.session && to.name !== 'login' && to.name !== 'register') {
+      return { name: 'login' };
+    }
+
+    if (data?.session && (to.name === 'login' || to.name === 'register')) {
       return { name: 'home' };
     }
   });
